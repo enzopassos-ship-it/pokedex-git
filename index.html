@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Garante que a página seja responsiva e se ajuste bem em celulares, tablets e computadores -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Links de recursos externos -->
+  <link rel="icon" href="./favicons/favicon-16x16.png"> <!-- Ícone que aparece na aba do navegador -->
+  <link rel="stylesheet" href="./css/style.css"> <!-- Arquivo de estilos (CSS) para deixar a Pokédex bonita -->
+
+  <!-- Main JS -->
+  <!-- 'defer' faz o script carregar junto com a página sem travar o HTML. O 'src' aponta para o seu arquivo JavaScript que acabamos de comentar -->
+  <script defer src="./js/script.js"></script>
+
+  <title>Pokédex</title> <!-- Título da aba do navegador -->
+</head>
+<body>
+  
+  <!-- Tag principal que engloba todo o conteúdo visível da Pokédex -->
+  <main>
+    <!-- Imagem onde o GIF animado do Pokémon vai aparecer -->
+    <img src="#" alt="pokemon" class="pokemon__image">
+
+    <!-- Título que agrupa o número e o nome do Pokémon -->
+    <h1 class="pokemon__data">
+      <!-- O número do Pokémon vai aparecer aqui dentro pelo JavaScript -->
+      <span class="pokemon__number"></span> -
+      <!-- O nome do Pokémon vai aparecer aqui dentro pelo JavaScript -->
+      <span class="pokemon__name"></span>
+    </h1>
+
+    <!-- Formulário que serve para digitar o nome ou número do Pokémon -->
+    <form class="form">
+      <input
+        type="search"
+        class="input__search"
+        placeholder="Name or Number" <!-- Texto de dica dentro da barra de pesquisa -->
+        required <!-- Torna o campo obrigatório para evitar buscas vazias -->
+      />
+    </form>
+
+    <!-- Caixa (div) para agrupar os botões de voltar e avançar -->
+    <div class="buttons">
+      <button class="button btn-prev">Prev &lt;</button> <!-- Botão de Anterior (&lt; desenha o sinal de <) -->
+      <button class="button btn-next">Next &gt;</button> <!-- Botão de Próximo (&gt; desenha o sinal de >) -->
+    </div>
+
+    <!-- Imagem de fundo ou carcaça da Pokédex que decora a tela -->
+    <img src="./images/pokedex.png" alt="pokedex" class="pokedex">
+  </main>
+
+</body>
+</html>
