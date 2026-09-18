@@ -1,75 +1,102 @@
-// Seleciona os elementos do HTML onde as informações do Pokémon serão exibidas
-const pokemonName = document.querySelector('.pokemon__name');
-const pokemonNumber = document.querySelector('.pokemon__number');
-const pokemonImage = document.querySelector('.pokemon__image');
+// ==========================================
+// 1. SELEÇÃO DE ELEMENTOS DO HTML (DOM)
+// ==========================================
+// Pegamos as tags do HTML pela classe CSS (ponto .) para podermos alterar os textos e imagens depois
+const pokemonName = document.querySelector('.pokemon__name');     // Onde vai aparecer o nome
+const pokemonNumber = document.querySelector('.pokemon__number'); // Onde vai aparecer o número/ID
+const pokemonImage = document.querySelector('.pokemon__image');   // Onde vai aparecer a imagem/GIF
 
-// Seleciona o formulário, o campo de busca e os botões de navegação
+// Pegamos o formulário, o campo de digitação e os dois botões
 const form = document.querySelector('.form');
 const input = document.querySelector('.input__search');
 const buttonPrev = document.querySelector('.btn-prev');
 const buttonNext = document.querySelector('.btn-next');
 
-// Variável que guarda o ID do Pokémon atual (começa no 1, que é o Bulbasaur)
+// ==========================================
+// 2. VARIÁVEIS DE CONTROLE
+// ==========================================
+// Guarda o ID do Pokémon que está na tela (começa em 1 = Bulbasaur)
 let searchPokemon = 1;
 
-// Função assíncrona para buscar os dados do Pokémon na PokéAPI
+// ==========================================
+// 3. FUNÇÃO QUE BUSCA DADOS NA API
+// ==========================================
+// 'async' avisa o JS que essa função faz requisições que demoram um tempo para responder
 const fetchPokemon = async (pokemon) => {
-  // Faz uma requisição para a API usando o nome ou ID passado
+  // 'await' faz o código esperar a API devolver os dados antes de continuar
   const APIResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
 
-  // Se a resposta for bem-sucedida (status 200), converte para JSON e retorna
+  // Se a busca deu certo (status 200 = sucesso)
   if (APIResponse.status === 200) {
+    // Converte a resposta bruta em dados de texto/objeto (JSON)
     const data = await APIResponse.json();
-    return data;
+    return data; // Retorna os dados prontos do Pokémon
   }
+  // Se não encontrar o Pokémon, a função encerra e não retorna nada
 }
 
-// Função para renderizar (mostrar) as informações do Pokémon na tela
+// ==========================================
+// 4. FUNÇÃO QUE DESENHA/ATUALIZA A TELA
+// ==========================================
 const renderPokemon = async (pokemon) => {
-  // Mostra um aviso de "Carregando..." enquanto os dados não chegam
+  // Mostra um aviso provisório enquanto baixa as informações
   pokemonName.innerHTML = 'Loading...';
   pokemonNumber.innerHTML = '';
 
-  // Aguarda a resposta da função fetchPokemon
+  // Busca as informações do Pokémon na API e aguarda o resultado
   const data = await fetchPokemon(pokemon);
 
-  // Se encontrou o Pokémon, atualiza a tela com os dados dele
+  // Se a API encontrou o Pokémon com sucesso
   if (data) {
-    pokemonImage.style.display = 'block';
-    pokemonName.innerHTML = data.name;
-    pokemonNumber.innerHTML = data.id;
-    // Pega o sprite animado da 5ª geração
-    pokemonImage.src = data['sprites']['versions']['generation-v']['black-white']['animated']['front_default'];
-    input.value = ''; // Limpa o campo de busca
-    searchPokemon = data.id; // Atualiza o ID atual
+    pokemonImage.style.display = 'block'; // Exibe a tag de imagem na tela
+    pokemonName.innerHTML = data.name;    // Coloca o nome do Pokémon
+    pokemonNumber.innerHTML = data.id;    // Coloca o número do Pokémon
+    
+    // Tenta pegar o GIF animado da 5ª geração
+    const animatedSprite = data['sprites']['versions']['generation-v']['black-white']['animated']['front_default'];
+    
+    // SE houver GIF (Pokémon #1 ao #649), usa ele. SE NÃO (Pokémon #650+), usa a imagem padrão estática
+    pokemonImage.src = animatedSprite || data['sprites']['front_default'];
+
+    input.value = '';        // Limpa o que o usuário digitou no campo de pesquisa
+    searchPokemon = data.id; // Atualiza a variável com o ID do Pokémon encontrado
   } else {
-    // Se o Pokémon não existir ou der erro, mostra mensagem de erro
-    pokemonImage.style.display = 'none';
-    pokemonName.innerHTML = 'Not found :c';
-    pokemonNumber.innerHTML = '';
+    // Se a busca falhar (ex: nome digitado não existe)
+    pokemonImage.style.display = 'none';    // Esconde o ícone de imagem quebrada
+    pokemonName.innerHTML = 'Not found :c'; // Mostra mensagem de erro
+    pokemonNumber.innerHTML = '';           // Apaga o número
   }
 }
 
-// Evento de envio (submit) do formulário (quando o usuário aperta Enter ou busca)
+// ==========================================
+// 5. EVENTOS (AÇÕES DO USUÁRIO)
+// ==========================================
+
+// Quando o usuário envia a pesquisa (aperta Enter no formulário)
 form.addEventListener('submit', (event) => {
-  event.preventDefault(); // Evita que a página recarregue
-  renderPokemon(input.value.toLowerCase()); // Busca o que foi digitado em letras minúsculas
+  event.preventDefault(); // Impede o navegador de recarregar a página toda
+  
+  // Converte a pesquisa para letras minúsculas (a API só entende letras minúsculas)
+  renderPokemon(input.value.toLowerCase());
 });
 
-// Evento de clique no botão "Prev" (Anterior)
+// Quando o usuário clica no botão "Prev" (Anterior)
 buttonPrev.addEventListener('click', () => {
-  // Só diminui se o ID for maior que 1 (para evitar números negativos ou zero)
+  // Só diminui se for maior que 1 (evita IDs 0 ou números negativos)
   if (searchPokemon > 1) {
-    searchPokemon -= 1;
-    renderPokemon(searchPokemon);
+    searchPokemon -= 1;           // Subtrai 1 do ID atual
+    renderPokemon(searchPokemon); // Recarrega a tela com o novo ID
   }
 });
 
-// Evento de clique no botão "Next" (Próximo)
+// Quando o usuário clica no botão "Next" (Próximo)
 buttonNext.addEventListener('click', () => {
-  searchPokemon += 1; // Incrementa o ID
-  renderPokemon(searchPokemon); // Renderiza o próximo Pokémon
+  searchPokemon += 1;           // Soma 1 ao ID atual
+  renderPokemon(searchPokemon); // Recarrega a tela com o novo ID
 });
 
-// Executa a função pela primeira vez ao carregar a página (mostrando o Pokémon 1)
+// ==========================================
+// 6. INICIALIZAÇÃO DA PÁGINA
+// ==========================================
+// Executa a função assim que a página carrega para já exibir o Pokémon nº 1 (Bulbasaur)
 renderPokemon(searchPokemon);
